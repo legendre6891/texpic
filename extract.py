@@ -10,16 +10,15 @@ import os
 
 import math
 
-CONSTANTS = {
-    'render_oversample': 5,
-    'display_oversample': 5,
-    'font_scale': 1,
-    'screen_dpi': 96,
-}
-CONSTANTS['oversample'] = CONSTANTS['render_oversample'] * CONSTANTS[
-    'display_oversample']
-CONSTANTS['dpi'] = CONSTANTS['screen_dpi'] * CONSTANTS[
-    'font_scale'] * 72.27 / 72 * CONSTANTS['oversample']
+
+RENDER_OVERSAMPLE = 5
+DISPLAY_OVERSAMPLE = 5
+OVERSAMPLE = RENDER_OVERSAMPLE * DISPLAY_OVERSAMPLE
+
+FONT_SCALE = 1
+SCREEN_DPI = 96
+
+DPI = SCREEN_DPI * FONT_SCALE * 72.27 / 72 * OVERSAMPLE
 
 
 def filename_no_ext(path):
@@ -79,16 +78,16 @@ def normalize_pnm(fname, depth, pagemargin=0):
 
     # calculate bottom padding
     snippet_depth = round(depth + pagemargin) - bottom_crop
-    depth_padded = round_up(snippet_depth, CONSTANTS['oversample'])
+    depth_padded = round_up(snippet_depth, OVERSAMPLE)
     depth_increment = depth_padded - snippet_depth
     bottom_padding = depth_increment
 
     # calculate top padding
-    height_padded = round_up(hc + bottom_padding, CONSTANTS['oversample'])
+    height_padded = round_up(hc + bottom_padding, OVERSAMPLE)
     top_padding = height_padded - (hc + bottom_padding)
 
     # calculate left and right padding, and distribute evenly
-    width_padded = round_up(wc, CONSTANTS['oversample'])
+    width_padded = round_up(wc, OVERSAMPLE)
     left_padding = int((width_padded - wc) / 2)
     right_padding = width_padded - wc - left_padding
 
@@ -104,14 +103,14 @@ def normalize_pnm(fname, depth, pagemargin=0):
 
     padded_width, padded_height = pnm_dimensions(padded_fname)
 
-    final_width = padded_width // CONSTANTS['render_oversample']
-    final_height = padded_height // CONSTANTS['render_oversample']
+    final_width = padded_width // RENDER_OVERSAMPLE
+    final_height = padded_height // RENDER_OVERSAMPLE
 
     png_fname = basename + '.png'
     with open(png_fname, 'wb') as f, open(padded_fname, 'r') as orig:
         p1 = subprocess.Popen('ppmtopgm', stdin=orig, stdout=PIPE)
         p2 = subprocess.Popen([
-            'pamscale', '-reduce', '{}'.format(CONSTANTS['render_oversample'])
+            'pamscale', '-reduce', '{}'.format(RENDER_OVERSAMPLE)
         ],
                               stdin=p1.stdout,
                               stdout=PIPE,
@@ -123,9 +122,9 @@ def normalize_pnm(fname, depth, pagemargin=0):
 
     # finally, the convesion to html
 
-    html_width = final_width // CONSTANTS['display_oversample']
-    html_height = final_height // CONSTANTS['display_oversample']
-    vertical_align = -depth_padded // CONSTANTS['oversample']
+    html_width = final_width // DISPLAY_OVERSAMPLE
+    html_height = final_height // DISPLAY_OVERSAMPLE
+    vertical_align = -depth_padded // OVERSAMPLE
 
     return html_width, html_height, vertical_align
 
