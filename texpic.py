@@ -192,12 +192,11 @@ def draw_equations(equations):
 '''
     print(template, file=f)
 
-    print(r'\begin{document}', file=f)
+    print(r'\begin{document}\n', file=f)
     for eq in equations:
         print(eq, file=f)
         print('', file=f)
     print(r'\end{document}', file=f)
-
     f.close()
 
     pics, depths = make_pnm(f.name)
@@ -205,14 +204,7 @@ def draw_equations(equations):
     pngs = []
     for pic, depth in zip(pics, depths):
         pngs.append(normalize_pnm(pic, depth))
-
-    
     return pngs
 
 
-
-equations = ['$a + b = 4$', '$x^2 + y^2 = z^2']
-
-
-
-__all__ = ['normalize_pnm', 'make_pnm']
+__all__ = ['normalize_pnm', 'make_pnm', 'draw_equations']
