@@ -1,1 +1,6 @@
 test.*
+__pycache__/
+build/
+split_pnm_stream.*
+split_pnm_stream.*
+!split_pnm_stream.pyx
